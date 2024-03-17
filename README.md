@@ -9,3 +9,5 @@ i have a website project in my github profile for the bot so you can invite him 
 - `pip install discord.py`
 - `pip install commands`
 - `pip install async-timeout`
+
+Obs: isn't a public bot anymore you can ask me on discord if you want it "Kaal_wy" is my username. 
