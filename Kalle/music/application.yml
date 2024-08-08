@@ -1,0 +1,14 @@
+server:
+  port: 2333
+lavalink:
+  server:
+    password: "yw24350"
+    sources:
+      youtube: true
+      bandcamp: true
+      soundcloud: true
+      twitch: true
+      vimeo: true
+      mixer: true
+      http: true
+      local: true

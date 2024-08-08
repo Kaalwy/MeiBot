@@ -1,0 +1,5 @@
+discord.py
+python-dotenv
+yt-dlp
+'discord[voice]'
+wavelink
