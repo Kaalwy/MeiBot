@@ -21,10 +21,10 @@ Ensure you have Python 3.8 or higher installed. You can download it from [Python
 
 1. **Clone the repository**:
 
-   ```bash
-   git clone https://github.com/yourusername/KalleBot.git
-   cd KalleBot
-   ```
+ ```bash
+ git clone https://github.com/yourusername/KalleBot.git
+ cd KalleBot
+ ```
 
 2. **.env required**:
 
@@ -45,7 +45,7 @@ python bot.py
 ### Usage
 
 Once your bot is up and running, you can invite it to your Discord server using the OAuth2 URL generated from the Discord Developer Portal. Use the following command prefixes to interact with KalleBot:
-
+```
     Music Commands:
         .join - Joins your voice channel.
         .leave - Leaves the voice channel.
@@ -61,17 +61,20 @@ Once your bot is up and running, you can invite it to your Discord server using 
         .unmute @user - Removes the mute from a user.
         .ban @user <reason> - Bans a user.
         .kick @user <reason> - Kicks a user from the server.
+```
 
-Contributing
+### Contributing
 
 Contributions are welcome! If you'd like to work on KalleBot, please follow these steps:
+```
+- Fork the repository.
+- Create a new branch for your feature or fix.
+- Make your changes.
+- Submit a pull request with a clear description of your changes.
+```
+or you can also call me by email or discord "kaalwy@proton.me"
 
-    Fork the repository.
-    Create a new branch for your feature or fix.
-    Make your changes.
-    Submit a pull request with a clear description of your changes.
-
-License
+### License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 Acknowledgments
