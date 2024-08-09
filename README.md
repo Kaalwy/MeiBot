@@ -73,10 +73,3 @@ Contributions are welcome! If you'd like to work on KalleBot, please follow thes
 - Submit a pull request with a clear description of your changes.
 ```
 or you can also call me by email or discord "kaalwy@proton.me"
-
-### License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-Acknowledgments
-
-If you have any questions or suggestions, don't hesitate to reach out via Discord!
