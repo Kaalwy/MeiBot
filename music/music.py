@@ -2,10 +2,12 @@ import os
 import discord
 from discord.ext import commands
 import yt_dlp
+import asyncio
+import re
 
 def setup_music_commands(bot):
-    # Fila de músicas
     music_queue = []
+    repeat_mode = False
 
     @bot.command(name='join', help='Faz o bot entrar no canal de voz')
     async def join(ctx):
@@ -26,18 +28,17 @@ def setup_music_commands(bot):
 
     @bot.command(name='play', aliases=['p'], help='Faz com que o bot toque um arquivo MP3 ou uma URL do YouTube')
     async def play(ctx, *, file_name_or_url: str):
-        """Comando para tocar um arquivo MP3 do sistema de arquivos ou um vídeo do YouTube."""
         downloads_directory = 'music/downloads/'
-        file_name = os.path.basename(file_name_or_url)  # Pegar apenas o nome do arquivo
+        file_name = os.path.basename(file_name_or_url)
         file_path = os.path.join(downloads_directory, file_name)
 
         if ctx.voice_client is None:
-            await ctx.send('Eu preciso estar em um canal de voz para tocar música. Use .join primeiro.')
-            return
+            channel = ctx.author.voice.channel
+            await channel.connect()
+            await ctx.send(f'Conectado ao canal {channel}')
 
-        # Se o argumento é uma URL do YouTube, faça o download do áudio
         if 'youtube.com' in file_name_or_url or 'youtu.be' in file_name_or_url:
-            await ctx.send(f'Baixando áudio de: {file_name_or_url}...')
+            status_message = await ctx.send('🔄 Baixando áudio...')
             try:
                 ydl_opts = {
                     'format': 'bestaudio/best',
@@ -46,37 +47,60 @@ def setup_music_commands(bot):
                         'preferredcodec': 'mp3',
                         'preferredquality': '192',
                     }],
-                    'outtmpl': os.path.join(downloads_directory, '%(title)s.%(ext)s'),  # Salva com o título na pasta downloads
+                    'outtmpl': os.path.join(downloads_directory, '%(title)s.%(ext)s'),
+                    'progress_hooks': [lambda d: asyncio.run_coroutine_threadsafe(show_progress(d, status_message, ctx), bot.loop)]
                 }
-                os.makedirs(downloads_directory, exist_ok=True)  # Garante que o diretório exista
+                os.makedirs(downloads_directory, exist_ok=True)
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     info = ydl.extract_info(file_name_or_url, download=True)
-                    file_path = os.path.join(downloads_directory, f"{info['title']}.mp3")
+                    sanitized_title = re.sub(r'[\\/*?:-()"<>|]', "", info['title'])
+                    file_path = os.path.join(downloads_directory, f"{sanitized_title}.mp3")
 
-                await ctx.send(f'Áudio pronto para tocar: {info["title"]}.mp3')
+                await status_message.edit(content=f'Áudio pronto para tocar: {sanitized_title}.mp3')
             except Exception as e:
-                await ctx.send(f'Ocorreu um erro ao baixar o áudio: {str(e)}')
+                await status_message.edit(content=f'Ocorreu um erro ao baixar o áudio: {str(e)}')
                 return
 
-        # Verifica se o arquivo existe após o download (ou se ele já estava lá)
         if not os.path.isfile(file_path):
             await ctx.send('Arquivo não encontrado mesmo após o download.')
             return
 
-        # Adiciona a música à fila
         music_queue.append(file_path)
 
-        # Se o bot não estiver tocando música, toca a primeira da fila
         if not ctx.voice_client.is_playing():
             await play_next(ctx)
 
+    async def show_progress(d, status_message, ctx):
+        if d['status'] == 'downloading':
+            total_size = d.get('total_bytes', 1)
+            downloaded = d.get('downloaded_bytes', 0)
+            percent = int(downloaded / total_size * 100)
+            bar_length = 10
+            filled_length = int(bar_length * percent // 100)
+            bar = '#' * filled_length + '-' * (bar_length - filled_length)
+            await status_message.edit(content=f'```md\n[{bar}] {percent}%\n```')
+
     async def play_next(ctx):
         """Função auxiliar para tocar a próxima música na fila."""
+        global repeat_mode
+
         if music_queue:
-            next_song = music_queue.pop(0)  # Pega a próxima música da fila
+            next_song = music_queue.pop(0)
             source = discord.FFmpegPCMAudio(next_song)
-            ctx.voice_client.play(source, after=lambda e: play_next(ctx))
+            ctx.voice_client.play(source, after=lambda e: asyncio.run_coroutine_threadsafe(play_next(ctx), bot.loop))
             await ctx.send(f'Tocando: {os.path.basename(next_song)}')
+
+            if repeat_mode:
+                music_queue.append(next_song)
+
+            while ctx.voice_client.is_playing():
+                await asyncio.sleep(1)
+
+            if not repeat_mode:
+                try:
+                    os.remove(next_song)
+                except Exception as e:
+                    await ctx.send(f'Erro ao deletar o arquivo: {str(e)}')
         else:
             await ctx.send('Não há mais músicas na fila.')
 
@@ -91,9 +115,9 @@ def setup_music_commands(bot):
     @bot.command(name='skip', help='Pula a música atual')
     async def skip(ctx):
         if ctx.voice_client.is_playing():
-            ctx.voice_client.stop()  # Para a música atual
+            ctx.voice_client.stop()
             await ctx.send('Música pulada')
-            await play_next(ctx)  # Chama a função para tocar a próxima música
+            await play_next(ctx)
         else:
             await ctx.send('Não há música tocando no momento')
 
@@ -104,3 +128,12 @@ def setup_music_commands(bot):
             await ctx.send(f'Fila de músicas:\n{queue_list}')
         else:
             await ctx.send('A fila está vazia.')
+
+    @bot.command(name='repeat', help='Ativa ou desativa o modo de repetição das músicas')
+    async def repeat(ctx):
+        global repeat_mode
+        repeat_mode = not repeat_mode
+        if repeat_mode:
+            await ctx.send('Modo de repetição ativado. Todas as músicas serão repetidas.')
+        else:
+            await ctx.send('Modo de repetição desativado.')
