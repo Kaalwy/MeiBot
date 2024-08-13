@@ -4,12 +4,32 @@ from datetime import datetime
 import asyncio
 
 def setup_moderation_commands(bot):
-    @bot.command(name="mute", aliases=['mutar'], help="silencia um usuario nos chats e muta ele nas calls do servidor por um tempo determinado\nexemplo: .mute @user 15m fazer bobagem\nuse d=dia, h=hora, m=minuto, s=segundo")
+    MUTE_CHANNEL_ID = 737871610760921218
+    LOG_CHANNEL_ID = 737871610760921218
+    EMBED_COLOR = 0x5c8dd6
+
+    async def send_log_embed(ctx, action, member, duration=None, reason=None):
+        embed = discord.Embed(
+            title=f"{action.capitalize()} - Registro",
+            color=EMBED_COLOR,
+            timestamp=datetime.utcnow()
+        )
+        embed.add_field(name="Autor da Ação", value=ctx.author.mention, inline=False)
+        embed.add_field(name="Usuário", value=member.mention, inline=False)
+        embed.add_field(name="Nick", value=member.name, inline=True)
+        embed.add_field(name="ID", value=member.id, inline=True)
+        if duration:
+            embed.add_field(name="Duração", value=duration, inline=True)
+        embed.add_field(name="Motivo", value=reason if reason else "Não especificado", inline=False)
+        embed.set_footer(text=f"Ação executada em {ctx.guild.name}")
+
+        log_channel = bot.get_channel(LOG_CHANNEL_ID)
+        if log_channel:
+            await log_channel.send(embed=embed)
+
+    @bot.command(name="mute", aliases=['mutar'], help="Silencia um usuário nos chats e muta ele nas calls do servidor por um tempo determinado.")
     @commands.has_permissions(kick_members=True)
     async def mute(ctx, member: discord.Member, duration: str, *, reason=None):
-        MUTE_CHANNEL_ID = 1158441388296392714
-        LOG_CHANNEL_ID = 1250788081032892446
-
         if ctx.channel.id != MUTE_CHANNEL_ID:
             await ctx.send(f'{ctx.author.mention}, você só pode usar este comando em um canal específico.')
             return
@@ -17,13 +37,8 @@ def setup_moderation_commands(bot):
         muted_role = discord.utils.get(ctx.guild.roles, name='kalle-mute')
         if not muted_role:
             muted_role = await ctx.guild.create_role(name='kalle-mute')
-
-            # Define as permissões do cargo
             for channel in ctx.guild.channels:
-                overwrite = discord.PermissionOverwrite()
-                overwrite.send_messages = False
-                overwrite.speak = False
-                
+                overwrite = discord.PermissionOverwrite(send_messages=False, speak=False)
                 await channel.set_permissions(muted_role, overwrite=overwrite)
 
         await member.add_roles(muted_role)
@@ -43,32 +58,9 @@ def setup_moderation_commands(bot):
             await member.remove_roles(muted_role)
             return
 
-        message = (
-            f"Advertido por: {ctx.author.mention}\n"
-            f"Usuário punido: {member.mention}\n"
-            f"Nome escrito: {member.name}\n"
-            f"ID: {member.id}\n"
-            f"Tempo de mute: {duration}\n"
-            f"Data: {datetime.now().strftime('%d/%m/%y %H:%M:%S')}\n"
-            f"Motivo: {reason if reason else 'Não especificado'}"
-        )
+        await ctx.send(f'{member.mention} foi mutado com sucesso. Motivo: {reason if reason else "Não especificado"}')
 
-        if reason:
-            await ctx.send(f'{member.mention} foi mutado com sucesso. Motivo: {reason}')
-        else:
-            await ctx.send(f'{member.mention} foi mutado com sucesso.')
-
-        log_channel = bot.get_channel(LOG_CHANNEL_ID)
-        if log_channel:
-            await log_channel.send(message)
-
-        try:
-            await ctx.author.send(f"Você mutou {member.mention} no servidor {ctx.guild.name} (ID: {ctx.guild.id}).\n"
-                                  f"O usuário mutado não pode enviar mensagens nos chats e falar nas chamadas de voz.")
-        except discord.Forbidden:
-            await ctx.send("Não foi possível enviar uma mensagem direta para você, pois você desativou suas mensagens diretas.")
-        except Exception as e:
-            await ctx.send(f"Ocorreu um erro ao tentar enviar uma mensagem direta para você: {e}")
+        await send_log_embed(ctx, "mute", member, duration, reason)
 
         await asyncio.sleep(mute_seconds)
         await member.remove_roles(muted_role)
@@ -78,7 +70,7 @@ def setup_moderation_commands(bot):
         except discord.Forbidden:
             pass
 
-    @bot.command(name="unmute", aliases=['desmutar'], help="desmuta um usuario\n.unmute @user")
+    @bot.command(name="unmute", aliases=['desmutar'], help="Desmuta um usuário.")
     @commands.has_permissions(kick_members=True)
     async def unmute(ctx, member: discord.Member):
         muted_role = discord.utils.get(ctx.guild.roles, name='kalle-mute')
@@ -88,19 +80,32 @@ def setup_moderation_commands(bot):
         else:
             await ctx.send(f'{member.mention} não está mutado.')
 
-    @bot.command(name='ban', aliases=['banir'], help="bane um usuario mencionado\nexemplo: .ban @user (reason)")
+        await send_log_embed(ctx, "unmute", member)
+
+    @bot.command(name='ban', aliases=['banir'], help="Bane um usuário mencionado.")
     @commands.has_permissions(ban_members=True)
     async def ban(ctx, member: discord.Member, *, reason=None):
+        if ctx.channel.id != MUTE_CHANNEL_ID:
+            await ctx.send(f'{ctx.author.mention}, você só pode usar este comando em um canal específico.')
+            return
+
         await member.ban(reason=reason)
         await ctx.send(f'{member} foi banido por {ctx.author} pelo seguinte motivo: {reason}')
+
+        await send_log_embed(ctx, "banimento", member, reason=reason)
 
     @bot.command(name='kick')
     @commands.has_permissions(kick_members=True)
     async def kick(ctx, member: discord.Member, *, reason=None):
+        if ctx.channel.id != MUTE_CHANNEL_ID:
+            await ctx.send(f'{ctx.author.mention}, você só pode usar este comando em um canal específico.')
+            return
+
         await member.kick(reason=reason)
         await ctx.send(f'{member} foi expulso por {ctx.author} pelo seguinte motivo: {reason}')
 
-    # Em caso de erro de permissao avise ao usuario
+        await send_log_embed(ctx, "expulsão", member, reason=reason)
+
     @mute.error
     @unmute.error
     @ban.error
