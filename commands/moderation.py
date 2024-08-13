@@ -4,8 +4,8 @@ from datetime import datetime
 import asyncio
 
 def setup_moderation_commands(bot):
-    MUTE_CHANNEL_ID = 737871610760921218
-    LOG_CHANNEL_ID = 737871610760921218
+    MUTE_CHANNEL_ID = 111111111111111111
+    LOG_CHANNEL_ID = 111111111111111111
     EMBED_COLOR = 0x5c8dd6
 
     async def send_log_embed(ctx, action, member, duration=None, reason=None):
