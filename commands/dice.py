@@ -68,8 +68,11 @@ def setup_dice_commands(bot):
             ]
 
             terrible_dice = [
+                "https://tenor.com/view/eggman-speech-bubble-gif-25564771",
+                "https://tenor.com/view/speechbubble-speech-bubble-please-meme-gif-25693113",
                 "https://tenor.com/view/touhou-reimu-reimu-hakurei-live-reaction-goku-stare-gif-17843086582445113317",
                 "https://tenor.com/view/owl-standing-gif-4614094214811740127",
+                "https://tenor.com/view/bubble-text-owl-text-bubble-bubble-text-owl-bubble-text-speech-bubble-owl-gif-25466686",
                 "https://tenor.com/view/cahara-fear-and-hunger-crowmauler-terrifying-presence-gif-11660160882700055465",
                 "https://tenor.com/view/ohno-meme-monkey-ohno-ohno-monkey-ohno-emote-ohno-twitch-emote-gif-119989999548046247",
                 "https://tenor.com/view/astolfo-speech-bubble-discord-monster-gif-26662120",
@@ -78,8 +81,39 @@ def setup_dice_commands(bot):
                 "https://tenor.com/view/aaah-gif-10038493696838146297",
                 "https://tenor.com/view/bocchi-bocchi-the-rock-hitori-gotoh-gif-27259628",
                 "https://tenor.com/view/peter-griffin-fly-meme-gif-22525004",
+                "https://tenor.com/view/saul-goodman-meme-speech-bubble-saul-goodman-gif-25296783",
                 "https://tenor.com/view/you-deer-deer-dark-souls-nokotan-my-deer-friend-nokotan-gif-15144319581244726751"
             ]
+
+            if num_dice == 30 and dice_type == 20:
+                await asyncio.sleep(0.2)
+                await ctx.send("MASTER SPAAAAAAAARK!")
+                await asyncio.sleep(0.6)
+                await ctx.send("*Marisa Kirisame, com o suor escorrendo pela testa e as mãos tremendo de exaustão, prepara seu possível último spell. As faíscas de energia começam a crepitar ao redor do Mini Hakkero, crescendo em intensidade até que se tornam uma tempestade de lasers. O cenário inteiro é engolido por uma luz radiante e ofuscante. Por um momento, o mundo parece parar. Com um grito de determinação, Marisa libera toda a sua força. A explosão de luz é tão intensa que parece rasgar a própria realidade. Quando a luz finalmente se dissipa, seu corpo exausto colapsa no chão. Mesmo em sua queda, um pequeno sorriso aparece em seus lábios.*")
+                await asyncio.sleep(1.7)
+                await ctx.send("https://tenor.com/view/marisa-marisa-kirisame-master-spark-marisa-master-spark-gif-26730855")
+                await asyncio.sleep(0.6)
+                await ctx.send(f"Seu dano com a Master Spark foi igual a {total}!")
+                return
+            
+            if num_dice == 1 and dice_type == 4 and total == 1:
+                deathMessages = [
+                    "Meu nome Kalle e seu destino esta selado",
+                    "Foi bom ter você nessa mesa",
+                    "Sua hora chegou",
+                    "Oh nao...",
+                    "Descanse em paz",
+                    "Eu até que gostava de você..."
+                ]
+
+                deathMessage = random.choice(deathMessages)
+
+                await ctx.send(f"{nickname} você observa um vislumbre da sua vida inteira passando pelos seus olhos...")
+                await asyncio.sleep(0.5)
+                await ctx.send(deathMessage)
+                await asyncio.sleep(0.7)
+                await ctx.send("https://tenor.com/view/he-gone-dead-hella-dead-gif-20116498")
+                return
             
             if num_dice  == 1 and dice_type == 2 and total == 2:
                 await asyncio.sleep(0.2)

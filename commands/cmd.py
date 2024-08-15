@@ -51,11 +51,16 @@ def setup_general_commands(bot):
         if message.author == bot.user:
             return
 
-        if bot.user.mentioned_in(message) and len(message.content.split()) == 1:
+        # Verifica se a mensagem contém apenas a menção ao bot
+        if len(message.mentions) == 1 and message.mentions[0] == bot.user and message.content.strip() == f"<@{bot.user.id}>":
             await message.add_reaction('❓')
             await send_help_message(message.channel)
         
         await bot.process_commands(message)
+
+    @bot.command(name="oi")
+    async def hello(ctx):
+        await ctx.send(f"Olá {ctx.author.mention}.")
 
     @bot.command(name="ticket")
     async def ticket(ctx):
@@ -63,7 +68,7 @@ def setup_general_commands(bot):
         await thread.add_user(ctx.author)
         await thread.send(f'Thread de suporte criada para {ctx.author.mention}. Somente você e os administradores podem ver.')
 
-    @bot.tree.command(name="hello")
+    @bot.tree.command(name="oi")
     async def hello(interaction: discord.Interaction):
         await interaction.response.send_message(f'Olá {interaction.user.mention}.')
 
