@@ -55,8 +55,8 @@ complete --command yt-dlp --long-option datebefore --description 'Download only 
 complete --command yt-dlp --long-option dateafter --description 'Download only videos uploaded on or after this date. The date formats accepted is the same as --date'
 complete --command yt-dlp --long-option min-views
 complete --command yt-dlp --long-option max-views
-complete --command yt-dlp --long-option match-filters --description 'Generic video filter. Any "OUTPUT TEMPLATE" field can be compared with a number or a string using the operators defined in "Filtering Formats". You can also simply specify a field to match if the field is present, use "!field" to check if the field is not present, and "&" to check multiple conditions. Use a "\" to escape "&" or quotes if needed. If used multiple times, the filter matches if at least one of the conditions is met. E.g. --match-filter !is_live --match-filter "like_count>?100 & description~='"'"'(?i)\bcats \& dogs\b'"'"'" matches only videos that are not live OR those that have a like count more than 100 (or the like field is not available) and also has a description that contains the phrase "cats & dogs" (caseless). Use "--match-filter -" to interactively ask whether to download each video'
-complete --command yt-dlp --long-option no-match-filters --description 'Do not use any --match-filter (default)'
+complete --command yt-dlp --long-option match-filters --description 'Generic video filter. Any "OUTPUT TEMPLATE" field can be compared with a number or a string using the operators defined in "Filtering Formats". You can also simply specify a field to match if the field is present, use "!field" to check if the field is not present, and "&" to check multiple conditions. Use a "\" to escape "&" or quotes if needed. If used multiple times, the filter matches if at least one of the conditions is met. E.g. --match-filters !is_live --match-filters "like_count>?100 & description~='"'"'(?i)\bcats \& dogs\b'"'"'" matches only videos that are not live OR those that have a like count more than 100 (or the like field is not available) and also has a description that contains the phrase "cats & dogs" (caseless). Use "--match-filters -" to interactively ask whether to download each video'
+complete --command yt-dlp --long-option no-match-filters --description 'Do not use any --match-filters (default)'
 complete --command yt-dlp --long-option break-match-filters --description 'Same as "--match-filters" but stops the download process when a video is rejected'
 complete --command yt-dlp --long-option no-break-match-filters --description 'Do not use any --break-match-filters (default)'
 complete --command yt-dlp --long-option no-playlist --description 'Download only the video, if the URL refers to a video and a playlist'
@@ -68,7 +68,7 @@ complete --command yt-dlp --long-option max-downloads --description 'Abort after
 complete --command yt-dlp --long-option break-on-existing --description 'Stop the download process when encountering a file that is in the archive'
 complete --command yt-dlp --long-option no-break-on-existing --description 'Do not stop the download process when encountering a file that is in the archive (default)'
 complete --command yt-dlp --long-option break-on-reject
-complete --command yt-dlp --long-option break-per-input --description 'Alters --max-downloads, --break-on-existing, --break-match-filter, and autonumber to reset per input URL'
+complete --command yt-dlp --long-option break-per-input --description 'Alters --max-downloads, --break-on-existing, --break-match-filters, and autonumber to reset per input URL'
 complete --command yt-dlp --long-option no-break-per-input --description '--break-on-existing and similar options terminates the entire download queue'
 complete --command yt-dlp --long-option skip-playlist-after-errors --description 'Number of allowed failures until the rest of the playlist is skipped'
 complete --command yt-dlp --long-option include-ads
@@ -275,8 +275,8 @@ complete --command yt-dlp --long-option exec --description 'Execute a command, o
 complete --command yt-dlp --long-option no-exec --description 'Remove any previously defined --exec'
 complete --command yt-dlp --long-option exec-before-download
 complete --command yt-dlp --long-option no-exec-before-download
-complete --command yt-dlp --long-option convert-subs --description 'Convert the subtitles to another format (currently supported: ass, lrc, srt, vtt) (Alias: --convert-subtitles)'
-complete --command yt-dlp --long-option convert-thumbnails --description 'Convert the thumbnails to another format (currently supported: jpg, png, webp). You can specify multiple rules using similar syntax as --remux-video'
+complete --command yt-dlp --long-option convert-subs --description 'Convert the subtitles to another format (currently supported: ass, lrc, srt, vtt). Use "--convert-subs none" to disable conversion (default) (Alias: --convert-subtitles)'
+complete --command yt-dlp --long-option convert-thumbnails --description 'Convert the thumbnails to another format (currently supported: jpg, png, webp). You can specify multiple rules using similar syntax as "--remux-video". Use "--convert-thumbnails none" to disable conversion (default)'
 complete --command yt-dlp --long-option split-chapters --description 'Split video into multiple files based on internal chapters. The "chapter:" prefix can be used with "--paths" and "--output" to set the output filename for the split files. See "OUTPUT TEMPLATE" for details'
 complete --command yt-dlp --long-option no-split-chapters --description 'Do not split video based on chapters (default)'
 complete --command yt-dlp --long-option remove-chapters --description 'Remove chapters whose title matches the given regular expression. The syntax is the same as --download-sections. This option can be used multiple times'

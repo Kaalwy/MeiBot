@@ -5,7 +5,7 @@ from discord.ext import commands
 import wavelink
 
 load_dotenv()
-TOKEN = os.getenv('KALLE_TOKEN')
+TOKEN = os.getenv('MEI_TOKEN')
 
 # define os intents para o bot
 intents = discord.Intents.default()

@@ -33,7 +33,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/home/kaal/Documents/Scripts/KalleBot/Kalle/venv"
+set -gx VIRTUAL_ENV "/home/kaal/Documents/Scripts/MeiBot/MeiBot-main/venv"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH

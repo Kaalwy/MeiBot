@@ -249,16 +249,16 @@ Use a \[dq]\[dq] to escape \[dq]&\[dq] or quotes if needed.
 If used multiple times, the filter matches if at least one of the
 conditions is met.
 E.g.
---match-filter !is_live --match-filter \[dq]like_count>?100 &
+--match-filters !is_live --match-filters \[dq]like_count>?100 &
 description\[ti]=\[aq](?i)& dogs\[dq] matches only videos that are not
 live OR those that have a like count more than 100 (or the like field is
 not available) and also has a description that contains the phrase
 \[dq]cats & dogs\[dq] (caseless).
-Use \[dq]--match-filter -\[dq] to interactively ask whether to download
+Use \[dq]--match-filters -\[dq] to interactively ask whether to download
 each video
 .TP
 --no-match-filters
-Do not use any --match-filter (default)
+Do not use any --match-filters (default)
 .TP
 --break-match-filters \f[I]FILTER\f[R]
 Same as \[dq]--match-filters\[dq] but stops the download process when a
@@ -295,7 +295,7 @@ Do not stop the download process when encountering a file that is in the
 archive (default)
 .TP
 --break-per-input
-Alters --max-downloads, --break-on-existing, --break-match-filter, and
+Alters --max-downloads, --break-on-existing, --break-match-filters, and
 autonumber to reset per input URL
 .TP
 --no-break-per-input
@@ -1033,12 +1033,16 @@ Remove any previously defined --exec
 .TP
 --convert-subs \f[I]FORMAT\f[R]
 Convert the subtitles to another format (currently supported: ass, lrc,
-srt, vtt) (Alias: --convert-subtitles)
+srt, vtt).
+Use \[dq]--convert-subs none\[dq] to disable conversion (default)
+(Alias: --convert- subtitles)
 .TP
 --convert-thumbnails \f[I]FORMAT\f[R]
 Convert the thumbnails to another format (currently supported: jpg, png,
 webp).
-You can specify multiple rules using similar syntax as --remux-video
+You can specify multiple rules using similar syntax as
+\[dq]--remux-video\[dq].
+Use \[dq]--convert- thumbnails none\[dq] to disable conversion (default)
 .TP
 --split-chapters
 Split video into multiple files based on internal chapters.
@@ -2607,15 +2611,17 @@ with variants \f[C]_music\f[R] and \f[C]_creator\f[R] (e.g.
 \f[C]android_producer\f[R], \f[C]android_testsuite\f[R],
 \f[C]android_vr\f[R], \f[C]web_safari\f[R], \f[C]web_embedded\f[R],
 \f[C]tv\f[R] and \f[C]tv_embedded\f[R] with no variants.
-By default, \f[C]ios,web_creator\f[R] is used, and
-\f[C]tv_embedded\f[R], \f[C]web_creator\f[R] and \f[C]mediaconnect\f[R]
-are added as required for age-gated videos.
+By default, \f[C]ios,mweb\f[R] is used, and \f[C]tv_embedded\f[R],
+\f[C]web_creator\f[R] and \f[C]mediaconnect\f[R] are added as required
+for age-gated videos.
 Similarly, the music variants are added for \f[C]music.youtube.com\f[R]
 urls.
 Most \f[C]android\f[R] clients will be given lowest priority since their
 formats are broken.
 You can use \f[C]all\f[R] to use all the clients, and \f[C]default\f[R]
 for the default clients.
+You can prefix a client with \f[C]-\f[R] to exclude it, e.g.
+\f[C]youtube:player_client=all,-web\f[R]
 .IP \[bu] 2
 \f[C]player_skip\f[R]: Skip some network requests that are generally
 needed for robust extraction.
@@ -2661,6 +2667,26 @@ By default, no API key is used
 .IP \[bu] 2
 \f[C]raise_incomplete_data\f[R]: \f[C]Incomplete Data Received\f[R]
 raises an error instead of reporting a warning
+.IP \[bu] 2
+\f[C]data_sync_id\f[R]: Overrides the account Data Sync ID used in
+Innertube API requests.
+This may be needed if you are using an account with
+\f[C]youtube:player_skip=webpage,configs\f[R] or
+\f[C]youtubetab:skip=webpage\f[R]
+.IP \[bu] 2
+\f[C]visitor_data\f[R]: Overrides the Visitor Data used in Innertube API
+requests.
+This should be used with \f[C]player_skip=webpage,configs\f[R] and
+without cookies.
+Note: this may have adverse effects if used improperly.
+If a session from a browser is wanted, you should pass cookies instead
+(which contain the Visitor ID)
+.IP \[bu] 2
+\f[C]po_token\f[R]: Proof of Origin (PO) Token(s) to use for requesting
+video playback.
+Comma seperated list of PO Tokens in the format
+\f[C]CLIENT+PO_TOKEN\f[R], e.g.
+\f[C]youtube:po_token=web+XXX,android+YYY\f[R]
 .SS youtubetab (YouTube playlists, channels, feeds, etc.)
 .IP \[bu] 2
 \f[C]skip\f[R]: One or more of \f[C]webpage\f[R] (skip initial webpage
@@ -3014,12 +3040,12 @@ Apache-2.0 (https://github.com/psf/requests/blob/main/LICENSE)
 The following provide support for impersonating browser requests.
 This may be required for some sites that employ TLS fingerprinting.
 .IP \[bu] 2
-\f[B]curl_cffi\f[R] (https://github.com/yifeikong/curl_cffi)
+\f[B]curl_cffi\f[R] (https://github.com/lexiforest/curl_cffi)
 (recommended) - Python binding for
-curl-impersonate (https://github.com/lwthiker/curl-impersonate).
+curl-impersonate (https://github.com/lexiforest/curl-impersonate).
 Provides impersonation targets for Chrome, Edge and Safari.
 Licensed under
-MIT (https://github.com/yifeikong/curl_cffi/blob/main/LICENSE)
+MIT (https://github.com/lexiforest/curl_cffi/blob/main/LICENSE)
 .RS 2
 .IP \[bu] 2
 Can be installed with the \f[C]curl-cffi\f[R] group, e.g.
@@ -3668,10 +3694,10 @@ Even more advanced operations can also be done with the help of
 \f[C]--wait-for-video\f[R], \f[C]--retry-sleep\f[R],
 \f[C]--sleep-requests\f[R], \f[C]--convert-thumbnails\f[R],
 \f[C]--force-download-archive\f[R], \f[C]--force-overwrites\f[R],
-\f[C]--break-match-filter\f[R] etc
+\f[C]--break-match-filters\f[R] etc
 .IP \[bu] 2
 \f[B]Improvements\f[R]: Regex and other operators in
-\f[C]--format\f[R]/\f[C]--match-filter\f[R], multiple
+\f[C]--format\f[R]/\f[C]--match-filters\f[R], multiple
 \f[C]--postprocessor-args\f[R] and \f[C]--downloader-args\f[R], faster
 archive checking, more format selection options, merge
 multi-video/audio, multiple \f[C]--config-locations\f[R],
@@ -3832,7 +3858,7 @@ aria2c (https://github.com/yt-dlp/yt-dlp/issues/5931)). You can use
 downloader output as-is]
 .IP \[bu] 2
 yt-dlp versions between 2021.09.01 and 2023.01.02 applies
-\f[C]--match-filter\f[R] to nested playlists.
+\f[C]--match-filters\f[R] to nested playlists.
 This was an unintentional side-effect of
 8f18ac (https://github.com/yt-dlp/yt-dlp/commit/8f18aca8717bb0dd49054555af8d386e5eda3a88)
 and is fixed in
@@ -3928,11 +3954,11 @@ due to their ease of use
 --get-thumbnail                  --print thumbnail
 -e, --get-title                  --print title
 -g, --get-url                    --print urls
---match-title REGEX              --match-filter \[dq]title \[ti]= (?i)REGEX\[dq]
---reject-title REGEX             --match-filter \[dq]title !\[ti]= (?i)REGEX\[dq]
---min-views COUNT                --match-filter \[dq]view_count >=? COUNT\[dq]
---max-views COUNT                --match-filter \[dq]view_count <=? COUNT\[dq]
---break-on-reject                Use --break-match-filter
+--match-title REGEX              --match-filters \[dq]title \[ti]= (?i)REGEX\[dq]
+--reject-title REGEX             --match-filters \[dq]title !\[ti]= (?i)REGEX\[dq]
+--min-views COUNT                --match-filters \[dq]view_count >=? COUNT\[dq]
+--max-views COUNT                --match-filters \[dq]view_count <=? COUNT\[dq]
+--break-on-reject                Use --break-match-filters
 --user-agent UA                  --add-header \[dq]User-Agent:UA\[dq]
 --referer URL                    --add-header \[dq]Referer:URL\[dq]
 --playlist-start NUMBER          -I NUMBER:

@@ -1,4 +1,4 @@
-#!/home/kaal/Documents/Scripts/KalleBot/Kalle/venv/bin/python
+#!/home/kaal/Documents/Scripts/MeiBot/MeiBot-main/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

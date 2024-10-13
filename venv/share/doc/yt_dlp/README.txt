@@ -528,17 +528,17 @@ Video Selection:
                                     conditions. Use a "\" to escape "&" or
                                     quotes if needed. If used multiple times,
                                     the filter matches if at least one of the
-                                    conditions is met. E.g. --match-filter
-                                    !is_live --match-filter "like_count>?100 &
+                                    conditions is met. E.g. --match-filters
+                                    !is_live --match-filters "like_count>?100 &
                                     description~='(?i)\bcats \& dogs\b'" matches
                                     only videos that are not live OR those that
                                     have a like count more than 100 (or the like
                                     field is not available) and also has a
                                     description that contains the phrase "cats &
-                                    dogs" (caseless). Use "--match-filter -" to
+                                    dogs" (caseless). Use "--match-filters -" to
                                     interactively ask whether to download each
                                     video
-    --no-match-filters              Do not use any --match-filter (default)
+    --no-match-filters              Do not use any --match-filters (default)
     --break-match-filters FILTER    Same as "--match-filters" but stops the
                                     download process when a video is rejected
     --no-break-match-filters        Do not use any --break-match-filters (default)
@@ -559,7 +559,7 @@ Video Selection:
                                     encountering a file that is in the archive
                                     (default)
     --break-per-input               Alters --max-downloads, --break-on-existing,
-                                    --break-match-filter, and autonumber to
+                                    --break-match-filters, and autonumber to
                                     reset per input URL
     --no-break-per-input            --break-on-existing and similar options
                                     terminates the entire download queue
@@ -1078,12 +1078,16 @@ Post-Processing Options:
                                     be used multiple times
     --no-exec                       Remove any previously defined --exec
     --convert-subs FORMAT           Convert the subtitles to another format
-                                    (currently supported: ass, lrc, srt, vtt)
-                                    (Alias: --convert-subtitles)
+                                    (currently supported: ass, lrc, srt, vtt).
+                                    Use "--convert-subs none" to disable
+                                    conversion (default) (Alias: --convert-
+                                    subtitles)
     --convert-thumbnails FORMAT     Convert the thumbnails to another format
                                     (currently supported: jpg, png, webp). You
                                     can specify multiple rules using similar
-                                    syntax as --remux-video
+                                    syntax as "--remux-video". Use "--convert-
+                                    thumbnails none" to disable conversion
+                                    (default)
     --split-chapters                Split video into multiple files based on
                                     internal chapters. The "chapter:" prefix can
                                     be used with "--paths" and "--output" to set
@@ -2165,12 +2169,13 @@ youtube
     are web, ios and android, with variants _music and _creator (e.g.
     ios_creator); and mediaconnect, mweb, android_producer,
     android_testsuite, android_vr, web_safari, web_embedded, tv and
-    tv_embedded with no variants. By default, ios,web_creator is used,
-    and tv_embedded, web_creator and mediaconnect are added as required
-    for age-gated videos. Similarly, the music variants are added for
+    tv_embedded with no variants. By default, ios,mweb is used, and
+    tv_embedded, web_creator and mediaconnect are added as required for
+    age-gated videos. Similarly, the music variants are added for
     music.youtube.com urls. Most android clients will be given lowest
     priority since their formats are broken. You can use all to use all
-    the clients, and default for the default clients.
+    the clients, and default for the default clients. You can prefix a
+    client with - to exclude it, e.g. youtube:player_client=all,-web
 -   player_skip: Skip some network requests that are generally needed
     for robust extraction. One or more of configs (skip client configs),
     webpage (skip initial webpage), js (skip js player). While these
@@ -2199,6 +2204,17 @@ youtube
     default, no API key is used
 -   raise_incomplete_data: Incomplete Data Received raises an error
     instead of reporting a warning
+-   data_sync_id: Overrides the account Data Sync ID used in Innertube
+    API requests. This may be needed if you are using an account with
+    youtube:player_skip=webpage,configs or youtubetab:skip=webpage
+-   visitor_data: Overrides the Visitor Data used in Innertube API
+    requests. This should be used with player_skip=webpage,configs and
+    without cookies. Note: this may have adverse effects if used
+    improperly. If a session from a browser is wanted, you should pass
+    cookies instead (which contain the Visitor ID)
+-   po_token: Proof of Origin (PO) Token(s) to use for requesting video
+    playback. Comma seperated list of PO Tokens in the format
+    CLIENT+PO_TOKEN, e.g. youtube:po_token=web+XXX,android+YYY
 
 youtubetab (YouTube playlists, channels, feeds, etc.)
 
@@ -2747,9 +2763,9 @@ New features
 -   Other new options: Many new options have been added such as --alias,
     --print, --concat-playlist, --wait-for-video, --retry-sleep,
     --sleep-requests, --convert-thumbnails, --force-download-archive,
-    --force-overwrites, --break-match-filter etc
+    --force-overwrites, --break-match-filters etc
 
--   Improvements: Regex and other operators in --format/--match-filter,
+-   Improvements: Regex and other operators in --format/--match-filters,
     multiple --postprocessor-args and --downloader-args, faster archive
     checking, more format selection options, merge multi-video/audio,
     multiple --config-locations, --exec at different stages, etc
@@ -2863,7 +2879,7 @@ and youtube-dlc:
     --compat-options no-external-downloader-progress to get the
     downloader output as-is~~
 -   yt-dlp versions between 2021.09.01 and 2023.01.02 applies
-    --match-filter to nested playlists. This was an unintentional
+    --match-filters to nested playlists. This was an unintentional
     side-effect of 8f18ac and is fixed in d7b460. Use
     --compat-options playlist-match-filter to revert this
 -   yt-dlp versions between 2021.11.10 and 2023.06.21 estimated
@@ -2933,11 +2949,11 @@ due to their ease of use
     --get-thumbnail                  --print thumbnail
     -e, --get-title                  --print title
     -g, --get-url                    --print urls
-    --match-title REGEX              --match-filter "title ~= (?i)REGEX"
-    --reject-title REGEX             --match-filter "title !~= (?i)REGEX"
-    --min-views COUNT                --match-filter "view_count >=? COUNT"
-    --max-views COUNT                --match-filter "view_count <=? COUNT"
-    --break-on-reject                Use --break-match-filter
+    --match-title REGEX              --match-filters "title ~= (?i)REGEX"
+    --reject-title REGEX             --match-filters "title !~= (?i)REGEX"
+    --min-views COUNT                --match-filters "view_count >=? COUNT"
+    --max-views COUNT                --match-filters "view_count <=? COUNT"
+    --break-on-reject                Use --break-match-filters
     --user-agent UA                  --add-header "User-Agent:UA"
     --referer URL                    --add-header "Referer:URL"
     --playlist-start NUMBER          -I NUMBER:

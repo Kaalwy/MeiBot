@@ -22,7 +22,9 @@ from . import _compat, _config, setters
 from ._compat import (
     PY_3_8_PLUS,
     PY_3_10_PLUS,
+    PY_3_11_PLUS,
     _AnnotationExtractor,
+    _get_annotations,
     get_generic_base,
 )
 from .exceptions import (
@@ -306,13 +308,6 @@ def _has_own_attribute(cls, attrib_name):
     Check whether *cls* defines *attrib_name* (and doesn't just inherit it).
     """
     return attrib_name in cls.__dict__
-
-
-def _get_annotations(cls):
-    """
-    Get annotations for *cls*.
-    """
-    return cls.__dict__.get("__annotations__", {})
 
 
 def _collect_base_attrs(cls, taken_attr_names):
@@ -1284,16 +1279,7 @@ def attrs(
 
     eq_, order_ = _determine_attrs_eq_order(cmp, eq, order, None)
 
-    # hash is deprecated & unsafe_hash takes precedence due to PEP 681.
-    if hash is not None:
-        import warnings
-
-        warnings.warn(
-            DeprecationWarning(
-                "The `hash` argument is deprecated in favor of `unsafe_hash` and will be removed in or after August 2025."
-            ),
-            stacklevel=2,
-        )
+    #  unsafe_hash takes precedence due to PEP 681.
     if unsafe_hash is not None:
         hash = unsafe_hash
 
@@ -2720,9 +2706,27 @@ class Converter:
         self.takes_self = takes_self
         self.takes_field = takes_field
 
-        self._first_param_type = _AnnotationExtractor(
-            converter
-        ).get_first_param_type()
+        ex = _AnnotationExtractor(converter)
+        self._first_param_type = ex.get_first_param_type()
+
+        if not (self.takes_self or self.takes_field):
+            self.__call__ = lambda value, _, __: self.converter(value)
+        elif self.takes_self and not self.takes_field:
+            self.__call__ = lambda value, instance, __: self.converter(
+                value, instance
+            )
+        elif not self.takes_self and self.takes_field:
+            self.__call__ = lambda value, __, field: self.converter(
+                value, field
+            )
+        else:
+            self.__call__ = lambda value, instance, field: self.converter(
+                value, instance, field
+            )
+
+        rt = ex.get_return_type()
+        if rt is not None:
+            self.__call__.__annotations__["return"] = rt
 
     @staticmethod
     def _get_global_name(attr_name: str) -> str:
@@ -2864,19 +2868,6 @@ def make_class(
         True,
     )
 
-    hash = attributes_arguments.pop("hash", _SENTINEL)
-    if hash is not _SENTINEL:
-        import warnings
-
-        warnings.warn(
-            DeprecationWarning(
-                "The `hash` argument is deprecated in favor of `unsafe_hash` and will be removed in or after August 2025."
-            ),
-            stacklevel=2,
-        )
-
-        attributes_arguments["unsafe_hash"] = hash
-
     cls = _attrs(these=cls_dict, **attributes_arguments)(type_)
     # Only add type annotations now or "_attrs()" will complain:
     cls.__annotations__ = {
@@ -2943,18 +2934,7 @@ def pipe(*converters):
 
     def pipe_converter(val, inst, field):
         for c in converters:
-            if isinstance(c, Converter):
-                val = c.converter(
-                    val,
-                    *{
-                        (False, False): (),
-                        (True, False): (c.takes_self,),
-                        (False, True): (c.takes_field,),
-                        (True, True): (c.takes_self, c.takes_field),
-                    }[c.takes_self, c.takes_field],
-                )
-            else:
-                val = c(val)
+            val = c(val, inst, field) if isinstance(c, Converter) else c(val)
 
         return val
 
@@ -2968,8 +2948,12 @@ def pipe(*converters):
         if t:
             pipe_converter.__annotations__["val"] = t
 
+        last = converters[-1]
+        if not PY_3_11_PLUS and isinstance(last, Converter):
+            last = last.__call__
+
         # Get return type from last converter.
-        rt = _AnnotationExtractor(converters[-1]).get_return_type()
+        rt = _AnnotationExtractor(last).get_return_type()
         if rt:
             pipe_converter.__annotations__["return"] = rt
 

@@ -1,5 +1,6 @@
 discord.py
 python-dotenv
 yt-dlp
-'discord[voice]'
+discord[voice]
 wavelink
+pynacl

@@ -85,7 +85,7 @@ def setup_dice_commands(bot):
                 "https://tenor.com/view/you-deer-deer-dark-souls-nokotan-my-deer-friend-nokotan-gif-15144319581244726751"
             ]
 
-            if num_dice == 30 and dice_type == 20:
+            if num_dice == 30 and dice_type == 4:
                 await asyncio.sleep(0.2)
                 await ctx.send("MASTER SPAAAAAAAARK!")
                 await asyncio.sleep(0.6)
