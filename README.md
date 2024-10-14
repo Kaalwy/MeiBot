@@ -1,6 +1,6 @@
-# KalleBot
+# MeiBot
 
-KalleBot is a simple yet powerful Discord bot designed to enhance your Discord server's experience. It offers various features, including music playback, dice rolling, moderation tools, and more. If you'd like to contribute or collaborate on this project, feel free to reach out to me on Discord with the username `kaal_wy`.
+MeiBot is a simple yet powerful Discord bot designed to enhance your Discord server's experience. It offers various features, including music playback, dice rolling, moderation tools, and more. If you'd like to contribute or collaborate on this project, feel free to reach out to me on Discord with the username `kaal_wy`.
 
 ## Features
 
@@ -11,7 +11,7 @@ KalleBot is a simple yet powerful Discord bot designed to enhance your Discord s
 
 ## Getting Started
 
-To get started with KalleBot, follow these simple steps:
+To get started with MeiBot, follow these simple steps:
 
 ### Prerequisites
 
@@ -22,8 +22,8 @@ Ensure you have Python 3.8 or higher installed. You can download it from [Python
 1. **Clone the repository**:
 
  ```bash
- git clone https://github.com/yourusername/KalleBot.git
- cd KalleBot
+ git clone https://github.com/Kaalwy/MeiBot.git
+ cd MeiBot
  ```
 
 2. **.env required**:
