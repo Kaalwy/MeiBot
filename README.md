@@ -44,7 +44,7 @@ python bot.py
 
 ### Usage
 
-Once your bot is up and running, you can invite it to your Discord server using the OAuth2 URL generated from the Discord Developer Portal. Use the following command prefixes to interact with KalleBot:
+Once your bot is up and running, you can invite it to your Discord server using the OAuth2 URL generated from the Discord Developer Portal. Use the following command prefixes to interact with MeiBot:
 ```
     Music Commands:
         .join - Joins your voice channel.
@@ -65,7 +65,7 @@ Once your bot is up and running, you can invite it to your Discord server using 
 
 ### Contributing
 
-Contributions are welcome! If you'd like to work on KalleBot, please follow these steps:
+Contributions are welcome! If you'd like to work on MeiBot, please follow these steps:
 ```
 - Fork the repository.
 - Create a new branch for your feature or fix.
