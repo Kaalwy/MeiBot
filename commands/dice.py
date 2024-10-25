@@ -15,7 +15,7 @@ def setup_dice_commands(bot):
 
             pattern = re.compile(r'(\d*)d(\d+)([+\-*/]\d+)?')
             match = pattern.match(command)
-            
+
             if not match:
                 await ctx.send('Putz. Tente usar algo como `.r d20`, `.roll 2d6+3`, etc.')
                 return
@@ -46,6 +46,12 @@ def setup_dice_commands(bot):
                 total = total // modifier if modifier != 0 else "erro de divisão por zero"
 
             nickname = ctx.author.nick if ctx.author.nick else ctx.author.name
+
+            embed = discord.Embed(title="🎲 Resultado da Rolagem", color=discord.Color.blue())
+            embed.add_field(name="Usuário", value=nickname, inline=True)
+            embed.add_field(name="Rolagem", value=command, inline=True)
+            embed.add_field(name="Resultados", value=results_str, inline=False)
+            embed.add_field(name="Total", value=total, inline=True)
 
             awesome_dice = [
                 "https://tenor.com/view/vergil-grin-devil-may-cry5-thumbs-up-smile-gif-26758676",
@@ -95,7 +101,7 @@ def setup_dice_commands(bot):
                 await asyncio.sleep(0.6)
                 await ctx.send(f"Seu dano com a Master Spark foi igual a {total}!")
                 return
-            
+
             if num_dice == 1 and dice_type == 4 and total == 1:
                 deathMessages = [
                     "Meu nome Kalle e seu destino esta selado",
@@ -150,7 +156,6 @@ def setup_dice_commands(bot):
                 await ctx.send("https://tenor.com/view/fear-and-hunger-coin-flip-lucky-coin-heads-heads-gif-11655328672403159466")
                 return
 
-            # Determine the quality of the dice roll based on the percentage of the maximum possible result
             if percentage == 100:
                 image = random.choice(awesome_dice)
             elif percentage >= 85:
@@ -162,9 +167,12 @@ def setup_dice_commands(bot):
             else:
                 image = random.choice(terrible_dice)
 
-            await ctx.send(f"{nickname}, rodou {command} e obteve: {results_str} = {total}")
-
+            await ctx.send(embed=embed)
+            await asyncio.sleep(0.6)
+            await ctx.send("Minha honesta reação...")
+            await asyncio.sleep(0.4)
             await ctx.send(image)
+
         except Exception as e:
             await ctx.send(f"Ops, ocorreu um erro: {e}")
 
