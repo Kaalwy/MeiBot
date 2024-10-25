@@ -34,7 +34,7 @@ def setup_general_commands(bot):
     async def send_help_message(ctx_or_interaction):
         help_message = """
         ```md
-# Todos os comandos da Kawy por categoria:
+# Todos os comandos da Mei por categoria:
 -----------------------------------
 
 * O prefixo para usar esse bot é o "." todos os comandos abaixo usam essa regra para serem evocados.
@@ -91,7 +91,7 @@ def setup_general_commands(bot):
     async def hello(ctx):
         current_hour = datetime.now().hour
 
-        if 0 <= current_hour < 12:
+        if 6 <= current_hour < 12:
             greeting = "Bom dia"
         elif 12 <= current_hour < 18:
             greeting = "Boa tarde"
@@ -100,7 +100,7 @@ def setup_general_commands(bot):
         
         await ctx.send(f"{greeting}, {ctx.author.mention}.")
 
-    @bot.command(name="oii", aliases=["hii", "hewwo", "hew", "heya"])
+    @bot.command(name="oii", aliases=["hii", "hewwo", "hew", "heya", "oiiee", "oie", "oiie"])
     async def hello(ctx):
         current_hour = datetime.now().hour
 
