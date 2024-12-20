@@ -49,7 +49,7 @@ def setup_general_commands(bot):
             `stop`: Para todas as músicas na lista.
             `queue`: Mostra a lista de músicas.
             """,
-            "🎲 Diversão": """
+            "🌀 Diversão": """
             `oi`: O bot te cumprimenta!
             `r (quantidade)d(tipo do dado)`: Rola dados para jogos (ex: `.r d20` ou `.r 2d10+6`).
             """,
@@ -118,7 +118,7 @@ def setup_general_commands(bot):
         elif 12 <= current_hour < 18:
             greetings = ["https://tenor.com/view/leah-pookie-bear-sanae-kochiya-touhou-gif-5920970219019213138"]
         else:
-            greetings = ["https://tenor.com/view/ado-giragira-gira-gira-good-night-goodnight-gif-5423733055869444136"]
+            greetings = ["https://media1.tenor.com/m/S0T4emekYCgAAAAd/ado-giragira.gif"]
 
         greeting_gif = random.choice(greetings)
         
@@ -137,7 +137,7 @@ def setup_general_commands(bot):
         await thread.add_user(ctx.author)
         
         embed = discord.Embed(
-            title="📝 Ticket Criado",
+            title="🖍 Ticket Criado",
             description=f"Thread de suporte criada para {ctx.author.mention}. Somente você e os administradores podem ver.",
             color=discord.Color.orange()
         )
@@ -158,8 +158,8 @@ def setup_general_commands(bot):
         deleted = await ctx.channel.purge(limit=amount)
         
         embed = discord.Embed(
-            title="🧹 Limpeza",
-            description=f"{len(deleted)} mensagens apagadas.",
+            title="🧹 Cleaning",
+            description=f"{len(deleted)} messages has been deleted.",
             color=discord.Color.green()
         )
         await ctx.send(embed=embed, delete_after=5)
@@ -194,6 +194,27 @@ def setup_general_commands(bot):
                 embed.set_image(url=selected_gif)
                 
                 await channel.send(embed=embed)
+
+    @bot.event
+    async def on_message(message):
+        if message.author == bot.user:
+            return
+        
+        REACTION_PROBABILITY = 0.02
+        RANDOM_EMOJIS = ['✌️', '👋', '🐱', '❤️', '👀', '💅']
+
+        if random.random() < REACTION_PROBABILITY:
+            emoji = random.choice(RANDOM_EMOJIS)
+            try:
+                await message.add_reaction(emoji)
+            except discord.HTTPException:
+                print(f"Failed to react with emoji {emoji}.")
+
+        if len(message.mentions) == 1 and message.mentions[0] == bot.user and message.content.strip() == f"<@{bot.user.id}>":
+            await message.add_reaction('❓')
+            await send_help_message(message.channel)
+        
+        await bot.process_commands(message)
 
 def setup(bot):
     setup_general_commands(bot)
